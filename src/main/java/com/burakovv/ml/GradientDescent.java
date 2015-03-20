@@ -11,6 +11,7 @@ public class GradientDescent {
     private static final double[][] X = {
             {1, 1, 1, 1, 1}, // must be filled with 1
             {1, 2, 3, 4, 5},
+            {1, 4, 9, 16, 25}, // = X[1] ^ 2
     };
 
     /**
@@ -31,12 +32,12 @@ public class GradientDescent {
     /**
      * Initial theta is the starting point for gradient descent algorithm.
      */
-    private static final double[] INITIAL_THETA = {0, 0};
+    private static final double[] INITIAL_THETA = {0, 0, 0};
 
     /**
      * Learning rate for gradient descent algorithm.
      */
-    private static final double ALPHA = 0.1d;
+    private static final double ALPHA = 0.003d;
 
     /**
      * Number of iterations to take finding optimal theta.
