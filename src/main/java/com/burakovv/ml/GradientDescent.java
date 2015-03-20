@@ -72,12 +72,12 @@ public class GradientDescent {
 
     private static void calcNewTheta(double[] oldTheta, double[] hypothesis, double[] newTheta) {
         for (int j = 0; j < N + 1; j++) {
-			double sigma = 0;
-			for (int i = 0; i < M; i++) {
-				sigma += (hypothesis[i] - Y[i]) * X[j][i];
-			}
-			newTheta[j] = oldTheta[j] - ALPHA / M * sigma;
-		}
+            double sigma = 0;
+            for (int i = 0; i < M; i++) {
+                sigma += (hypothesis[i] - Y[i]) * X[j][i];
+            }
+            newTheta[j] = oldTheta[j] - ALPHA / M * sigma;
+        }
     }
 
     private static double cost(double[] theta) {
