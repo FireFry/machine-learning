@@ -44,50 +44,70 @@ public class GradientDescent {
      */
     private static final int ITERATIONS = 1000000;
 
+    private final double[][] x;
+    private final double[] y;
+    private final double[] hypothesis;
+    private double[] theta;
+    private double[] newTheta;
+
     public static void main(String[] args) {
-        double[] theta = Arrays.copyOf(INITIAL_THETA, INITIAL_THETA.length);
-        double[] buffer = new double[INITIAL_THETA.length];
-        double[] hypothesis = new double[M];
+        GradientDescent gradientDescent = new GradientDescent(X, Y, INITIAL_THETA);
 
         for (int i = 0; i < ITERATIONS; i++) {
-            double[] prevTheta = theta;
-            theta = buffer;
-            calcHypothesis(prevTheta, hypothesis);
-            calcNewTheta(prevTheta, hypothesis, theta);
-            buffer = prevTheta;
+            gradientDescent.iterate();
         }
 
-        System.out.println("Theta: " + Arrays.toString(theta));
-        System.out.println("Cost: " + cost(theta));
+        System.out.println("Theta: " + Arrays.toString(gradientDescent.theta));
+        System.out.println("Cost: " + gradientDescent.cost());
     }
 
-    private static void calcHypothesis(double[] theta, double[] hypothesis) {
+    public GradientDescent(double[][] x, double[] y, double[] initialTheta) {
+        this.x = x;
+        this.y = y;
+        this.theta = Arrays.copyOf(initialTheta, initialTheta.length);
+        this.newTheta = new double[theta.length];
+        this.hypothesis = new double[M];
+    }
+
+    public void iterate() {
+        calcHypothesis();
+        calcNewTheta();
+        swapTheta();
+    }
+
+    private void swapTheta() {
+        double[] tmp = theta;
+        theta = newTheta;
+        newTheta = tmp;
+    }
+
+    private void calcHypothesis() {
         for (int i = 0; i < M; i++) {
             hypothesis[i] = 0;
             for (int j = 0; j < N + 1; j++) {
-                hypothesis[i] += theta[j] * X[j][i];
+                hypothesis[i] += theta[j] * x[j][i];
             }
         }
     }
 
-    private static void calcNewTheta(double[] oldTheta, double[] hypothesis, double[] newTheta) {
+    private void calcNewTheta() {
         for (int j = 0; j < N + 1; j++) {
             double sigma = 0;
             for (int i = 0; i < M; i++) {
-                sigma += (hypothesis[i] - Y[i]) * X[j][i];
+                sigma += (hypothesis[i] - y[i]) * x[j][i];
             }
-            newTheta[j] = oldTheta[j] - ALPHA / M * sigma;
+            newTheta[j] = theta[j] - ALPHA / M * sigma;
         }
     }
 
-    private static double cost(double[] theta) {
+    private double cost() {
         double sigma = 0;
         for (int i = 0; i < M; i++) {
             double polynomial = 0;
             for (int j = 0; j < N + 1; j++) {
-                polynomial += theta[j] * X[j][i];
+                polynomial += theta[j] * x[j][i];
             }
-            double delta = polynomial - Y[i];
+            double delta = polynomial - y[i];
             sigma += delta * delta;
         }
         return sigma / (2 * M);
