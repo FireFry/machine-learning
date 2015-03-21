@@ -2,6 +2,7 @@ package com.burakovv;
 
 import com.burakovv.math.MappedVector;
 import com.burakovv.math.Polynomial;
+import com.burakovv.math.NormalizedVector;
 import com.burakovv.math.Vector;
 import com.burakovv.math.Vectors;
 import com.burakovv.ml.GradientDescent;
@@ -20,7 +21,15 @@ public class GradientDescentApp {
 
         Vector initialTheta = Vectors.of(0, 0, 0);
 
-        GradientDescent gradientDescent = new GradientDescent(0.003d, initialTheta, y, x, squaredX);
+        NormalizedVector xnorm = new NormalizedVector(x);
+        NormalizedVector sxnorm = new NormalizedVector(squaredX);
+        GradientDescent gradientDescent = new GradientDescent(
+                1d,
+                initialTheta,
+                y,
+                xnorm,
+                sxnorm
+        );
         for (int i = 0; i < 10000; i++) {
             gradientDescent.iterate();
         }
@@ -28,5 +37,18 @@ public class GradientDescentApp {
         System.out.println("Theta: " + gradientDescent.getTheta());
         System.out.println("Theta error: " + Vectors.minus(polynomial.getParameters(), gradientDescent.getTheta()));
         System.out.println("Cost: " + gradientDescent.cost());
+
+        System.out.println("Expected result: " + polynomial.eval(5173d));
+        System.out.println("Actual result: " + (
+                gradientDescent.getTheta().get(0) +
+                gradientDescent.getTheta().get(1) * (5173d * xnorm.getScaleFactor() + xnorm.getAddition()) +
+                gradientDescent.getTheta().get(2) * (5173d * 5173d * sxnorm.getScaleFactor() + sxnorm.getAddition())
+        ));
+
+        System.out.println("Denormalized theta: " + Vectors.of(
+                gradientDescent.getTheta().get(0) + gradientDescent.getTheta().get(1) * xnorm.getAddition() + gradientDescent.getTheta().get(2) * sxnorm.getAddition(),
+                gradientDescent.getTheta().get(1) * xnorm.getScaleFactor(),
+                gradientDescent.getTheta().get(2) * sxnorm.getScaleFactor()
+        ));
     }
 }

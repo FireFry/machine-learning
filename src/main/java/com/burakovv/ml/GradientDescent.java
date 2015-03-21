@@ -7,13 +7,16 @@ import com.burakovv.math.Vector;
 import com.burakovv.math.Vectors;
 import com.burakovv.math.VectorsMatrix;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GradientDescent {
 
     /**
      * Features matrix X[n][m] where n is number of features and m is number of training examples.
      * X[0] vector represents extra feature required by gradient descent algorithm and must be equal to 1 for each training example.
      */
-    private final Matrix x;
+    private final List<Vector> x;
 
     /**
      * Training examples output vector.
@@ -54,23 +57,16 @@ public class GradientDescent {
     };
 
     public GradientDescent(double alpha, Vector initialTheta, Vector y, Vector x1, Vector... xs) {
-        this(
-                new VectorsMatrix.Builder(x1.size()) {{
-                    add(Vectors.only(1d, x1.size()));
-                    add(x1);
-                    addAll(xs);
-                }}.build(),
-                y,
-                initialTheta,
-                alpha
-        );
-    }
-
-    public GradientDescent(Matrix x, Vector y, Vector initialTheta, double alpha) {
-        this.x = x;
+        this.x = new ArrayList<Vector>() {{
+            add(Vectors.only(1d, x1.size()));
+            add(x1);
+            for (Vector x : xs) {
+                add(x);
+            }
+        }};
         this.y = y;
-        this.n = x.columns();
-        this.m = x.rows();
+        this.n = x.size();
+        this.m = x1.size();
         this.alpha = alpha;
         this.theta = ArrayVector.copyOf(initialTheta);
         this.nextTheta = new ArrayVector(theta.size());
@@ -93,7 +89,7 @@ public class GradientDescent {
         for (int i = 0; i < m; i++) {
             hypothesis.set(i, 0);
             for (int j = 0; j < n; j++) {
-                hypothesis.set(i, hypothesis.get(i) + theta.get(j) * x.get(i, j));
+                hypothesis.set(i, hypothesis.get(i) + theta.get(j) * x.get(j).get(i));
             }
         }
     }
@@ -102,7 +98,7 @@ public class GradientDescent {
         for (int j = 0; j < n; j++) {
             double sigma = 0;
             for (int i = 0; i < m; i++) {
-                sigma += (hypothesis.get(i) - y.get(i)) * x.get(i, j);
+                sigma += (hypothesis.get(i) - y.get(i)) * x.get(j).get(i);
             }
             nextTheta.set(j, theta.get(j) - alpha / m * sigma);
         }
@@ -113,7 +109,7 @@ public class GradientDescent {
         for (int i = 0; i < m; i++) {
             double polynomial = 0;
             for (int j = 0; j < n; j++) {
-                polynomial += theta.get(j) * x.get(i, j);
+                polynomial += theta.get(j) * x.get(j).get(i);
             }
             double delta = polynomial - y.get(i);
             sigma += delta * delta;
