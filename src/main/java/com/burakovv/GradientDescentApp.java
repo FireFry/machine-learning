@@ -8,7 +8,7 @@ import com.burakovv.ml.GradientDescent;
 
 public class GradientDescentApp {
     public static void main(String[] args) {
-        Vector x = Vectors.range(1, 5);
+        Vector x = Vectors.range(1, 500);
         Polynomial polynomial = new Polynomial(Vectors.of(1, -2, 1));
         Vector y = Vectors.map(x, polynomial);
         Vector squaredX = new MappedVector(x) {
@@ -21,7 +21,7 @@ public class GradientDescentApp {
         Vector initialTheta = Vectors.of(0, 0, 0);
 
         GradientDescent gradientDescent = new GradientDescent(0.003d, initialTheta, y, x, squaredX);
-        for (int i = 0; i < 1000000; i++) {
+        for (int i = 0; i < 10000; i++) {
             gradientDescent.iterate();
         }
 

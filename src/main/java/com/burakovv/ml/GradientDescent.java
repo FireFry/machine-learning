@@ -4,6 +4,8 @@ import com.burakovv.math.AbstractVector;
 import com.burakovv.math.ArrayVector;
 import com.burakovv.math.Matrix;
 import com.burakovv.math.Vector;
+import com.burakovv.math.Vectors;
+import com.burakovv.math.VectorsMatrix;
 
 public class GradientDescent {
 
@@ -53,29 +55,11 @@ public class GradientDescent {
 
     public GradientDescent(double alpha, Vector initialTheta, Vector y, Vector x1, Vector... xs) {
         this(
-                new Matrix() {
-                    @Override
-                    public int rows() {
-                        return x1.size();
-                    }
-
-                    @Override
-                    public int columns() {
-                        return xs.length + 2;
-                    }
-
-                    @Override
-                    public double get(int r, int c) {
-                        switch (c) {
-                            case 0:
-                                return 1;
-                            case 1:
-                                return x1.get(r);
-                            default:
-                                return xs[c - 2].get(r);
-                        }
-                    }
-                },
+                new VectorsMatrix.Builder(x1.size()) {{
+                    add(Vectors.only(1d, x1.size()));
+                    add(x1);
+                    addAll(xs);
+                }}.build(),
                 y,
                 initialTheta,
                 alpha

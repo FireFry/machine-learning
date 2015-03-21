@@ -67,6 +67,20 @@ public class Vectors {
         };
     }
 
+    public static Vector only(double val, int size) {
+        return new AbstractVector() {
+            @Override
+            public int size() {
+                return size;
+            }
+
+            @Override
+            public double get(int i) {
+                return val;
+            }
+        };
+    }
+
     private static class VectorWrapper extends AbstractVector {
         private double[] data;
 
