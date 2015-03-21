@@ -2,10 +2,9 @@ package com.burakovv.ml;
 
 import com.burakovv.math.AbstractVector;
 import com.burakovv.math.ArrayVector;
-import com.burakovv.math.Matrix;
+import com.burakovv.math.NormalizedVector;
 import com.burakovv.math.Vector;
 import com.burakovv.math.Vectors;
-import com.burakovv.math.VectorsMatrix;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,24 +43,12 @@ public class GradientDescent {
 
     private ArrayVector nextTheta;
 
-    private final Vector thetaView = new AbstractVector() {
-        @Override
-        public int size() {
-            return theta.size();
-        }
-
-        @Override
-        public double get(int i) {
-            return theta.get(i);
-        }
-    };
-
     public GradientDescent(double alpha, Vector initialTheta, Vector y, Vector x1, Vector... xs) {
         this.x = new ArrayList<Vector>() {{
             add(Vectors.only(1d, x1.size()));
-            add(x1);
+            add(new NormalizedVector(x1));
             for (Vector x : xs) {
-                add(x);
+                add(new NormalizedVector(x));
             }
         }};
         this.y = y;
@@ -118,6 +105,24 @@ public class GradientDescent {
     }
 
     public Vector getTheta() {
-        return thetaView;
+        return new AbstractVector() {
+            @Override
+            public int size() {
+                return theta.size();
+            }
+
+            @Override
+            public double get(int i) {
+                if (i == 0) {
+                    double sum = theta.get(0);
+                    for (int j = 1; j < theta.size(); j++) {
+                        sum += theta.get(j) * ((NormalizedVector)x.get(j)).getAddition();
+                    }
+                    return sum;
+                } else {
+                    return theta.get(i) * ((NormalizedVector)x.get(i)).getScaleFactor();
+                }
+            }
+        };
     }
 }

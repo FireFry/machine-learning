@@ -1,6 +1,7 @@
 package com.burakovv.math;
 
 public class NormalizedVector extends ForwardingVector {
+    public static final double EPSILON = 1e-3;
     private final double addition;
     private final double scaleFactor;
 
@@ -18,7 +19,7 @@ public class NormalizedVector extends ForwardingVector {
                 min = value;
             }
         }
-        scaleFactor = 1d / (max - min);
+        scaleFactor = Math.abs(max - min) > EPSILON ? 1d / (max - min) : 1d;
         addition = -sum * scaleFactor / delegate.size();
     }
 
