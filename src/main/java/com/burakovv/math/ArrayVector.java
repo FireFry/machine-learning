@@ -8,7 +8,7 @@ public class ArrayVector implements Vector {
     public static ArrayVector copyOf(Vector vector) {
         ArrayVector copy = new ArrayVector(vector.size());
         for (int i = 0; i < vector.size(); i++) {
-            copy.set(i, vector.get(i));
+            copy.data[i] = vector.get(i);
         }
         return copy;
     }

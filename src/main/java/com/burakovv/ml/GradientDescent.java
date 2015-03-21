@@ -1,76 +1,100 @@
 package com.burakovv.ml;
 
 import com.burakovv.math.ArrayVector;
-import com.burakovv.math.Matrices;
 import com.burakovv.math.Matrix;
 import com.burakovv.math.Vector;
-import com.burakovv.math.Vectors;
 
 public class GradientDescent {
 
     /**
-     * Features matrix X[N + 1][M] where N is number of features and M is number of training examples.
+     * Features matrix X[n][m] where n is number of features and m is number of training examples.
      * X[0] vector represents extra feature required by gradient descent algorithm and must be equal to 1 for each training example.
      */
-    private static final Matrix X = Matrices.of(new double[][]{
-            {1, 1, 1, 1, 1}, // must be filled with 1
-            {1, 2, 3, 4, 5},
-            {1, 4, 9, 16, 25}, // = X[1] ^ 2
-    });
+    private final Matrix x;
 
     /**
      * Training examples output vector.
      */
-    private static final Vector Y = Vectors.of(new double[]{0, 1, 4, 9, 16});
+    private final Vector y;
 
     /**
      * Number of features.
      */
-    private static final int N = (X.columns() - 1);
+    private final int n;
 
     /**
      * Number of training examples.
      */
-    private static final int M = X.rows();
-
-    /**
-     * Initial theta is the starting point for gradient descent algorithm.
-     */
-    private static final Vector INITIAL_THETA = Vectors.of(new double[]{0, 0, 0});
+    private final int m;
 
     /**
      * Learning rate for gradient descent algorithm.
      */
-    private static final double ALPHA = 0.003d;
+    private final double alpha;
 
-    /**
-     * Number of iterations to take finding optimal theta.
-     */
-    private static final int ITERATIONS = 1000000;
-
-    private final Matrix x;
-    private final Vector y;
     private final ArrayVector hypothesis;
+
     private ArrayVector theta;
-    private ArrayVector newTheta;
 
-    public static void main(String[] args) {
-        GradientDescent gradientDescent = new GradientDescent(X, Y, INITIAL_THETA);
+    private ArrayVector nextTheta;
 
-        for (int i = 0; i < ITERATIONS; i++) {
-            gradientDescent.iterate();
+    private final Vector thetaView = new Vector() {
+        @Override
+        public int size() {
+            return theta.size();
         }
 
-        System.out.println("Theta: " + gradientDescent.theta);
-        System.out.println("Cost: " + gradientDescent.cost());
+        @Override
+        public double get(int i) {
+            return theta.get(i);
+        }
+
+        @Override
+        public String toString() {
+            return theta.toString();
+        }
+    };
+
+    public GradientDescent(double alpha, Vector initialTheta, Vector y, Vector x1, Vector... xs) {
+        this(
+                new Matrix() {
+                    @Override
+                    public int rows() {
+                        return x1.size();
+                    }
+
+                    @Override
+                    public int columns() {
+                        return xs.length + 2;
+                    }
+
+                    @Override
+                    public double get(int r, int c) {
+                        switch (c) {
+                            case 0:
+                                return 1;
+                            case 1:
+                                return x1.get(r);
+                            default:
+                                return xs[c - 2].get(r);
+                        }
+                    }
+                },
+                y,
+                initialTheta,
+                alpha
+        );
     }
 
-    public GradientDescent(Matrix x, Vector y, Vector initialTheta) {
+    public GradientDescent(Matrix x, Vector y, Vector initialTheta, double alpha) {
         this.x = x;
         this.y = y;
+        this.n = x.columns();
+        this.m = x.rows();
+        this.alpha = alpha;
         this.theta = ArrayVector.copyOf(initialTheta);
-        this.newTheta = new ArrayVector(theta.size());
-        this.hypothesis = new ArrayVector(M);
+        this.nextTheta = new ArrayVector(theta.size());
+        this.hypothesis = new ArrayVector(m);
     }
 
     public void iterate() {
@@ -81,39 +105,43 @@ public class GradientDescent {
 
     private void swapTheta() {
         ArrayVector tmp = theta;
-        theta = newTheta;
-        newTheta = tmp;
+        theta = nextTheta;
+        nextTheta = tmp;
     }
 
     private void calcHypothesis() {
-        for (int i = 0; i < M; i++) {
+        for (int i = 0; i < m; i++) {
             hypothesis.set(i, 0);
-            for (int j = 0; j < N + 1; j++) {
-                hypothesis.set(i, hypothesis.get(i) + theta.get(j) * x.get(j, i));
+            for (int j = 0; j < n; j++) {
+                hypothesis.set(i, hypothesis.get(i) + theta.get(j) * x.get(i, j));
             }
         }
     }
 
     private void calcNewTheta() {
-        for (int j = 0; j < N + 1; j++) {
+        for (int j = 0; j < n; j++) {
             double sigma = 0;
-            for (int i = 0; i < M; i++) {
-                sigma += (hypothesis.get(i) - y.get(i)) * x.get(j, i);
+            for (int i = 0; i < m; i++) {
+                sigma += (hypothesis.get(i) - y.get(i)) * x.get(i, j);
             }
-            newTheta.set(j, theta.get(j) - ALPHA / M * sigma);
+            nextTheta.set(j, theta.get(j) - alpha / m * sigma);
         }
     }
 
-    private double cost() {
+    public double cost() {
         double sigma = 0;
-        for (int i = 0; i < M; i++) {
+        for (int i = 0; i < m; i++) {
             double polynomial = 0;
-            for (int j = 0; j < N + 1; j++) {
-                polynomial += theta.get(j) * x.get(j, i);
+            for (int j = 0; j < n; j++) {
+                polynomial += theta.get(j) * x.get(i, j);
             }
             double delta = polynomial - y.get(i);
             sigma += delta * delta;
         }
-        return sigma / (2 * M);
+        return sigma / (2 * m);
+    }
+
+    public Vector getTheta() {
+        return thetaView;
     }
 }
