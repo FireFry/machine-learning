@@ -24,7 +24,7 @@ public class Vectors {
 
     private static Vector range(int min, int max, int step) {
         final int size = (max - min) / step;
-        return new Vector() {
+        return new AbstractVector() {
             @Override
             public int size() {
                 return size;
@@ -40,7 +40,34 @@ public class Vectors {
         };
     }
 
-    private static class VectorWrapper implements Vector {
+    public static String toString(Vector vector) {
+        StringBuilder sb = new StringBuilder().append('[');
+        for (int i = 0, size = vector.size(); i < size; i++) {
+            sb.append(vector.get(i));
+            if (i < size - 1) {
+                sb.append(", ");
+            } else {
+                sb.append(']');
+            }
+        }
+        return sb.toString();
+    }
+
+    public static Vector minus(Vector v1, Vector v2) {
+        return new AbstractVector() {
+            @Override
+            public int size() {
+                return v1.size();
+            }
+
+            @Override
+            public double get(int i) {
+                return v1.get(i) - v2.get(i);
+            }
+        };
+    }
+
+    private static class VectorWrapper extends AbstractVector {
         private double[] data;
 
         public VectorWrapper(double[] data) {
@@ -55,13 +82,6 @@ public class Vectors {
         @Override
         public double get(int i) {
             return data[i];
-        }
-
-        @Override
-        public String toString() {
-            return "VectorWrapper{" +
-                    "data=" + Arrays.toString(data) +
-                    '}';
         }
     }
 }

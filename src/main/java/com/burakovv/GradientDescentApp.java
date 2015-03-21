@@ -26,6 +26,7 @@ public class GradientDescentApp {
         }
 
         System.out.println("Theta: " + gradientDescent.getTheta());
+        System.out.println("Theta error: " + Vectors.minus(polynomial.getParameters(), gradientDescent.getTheta()));
         System.out.println("Cost: " + gradientDescent.cost());
     }
 }

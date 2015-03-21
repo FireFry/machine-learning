@@ -19,4 +19,8 @@ public class Polynomial implements Function {
         }
         return acc;
     }
+
+    public Vector getParameters() {
+        return parameters;
+    }
 }

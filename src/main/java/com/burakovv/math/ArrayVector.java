@@ -1,8 +1,6 @@
 package com.burakovv.math;
 
-import java.util.Arrays;
-
-public class ArrayVector implements Vector {
+public class ArrayVector extends AbstractVector {
     private final double[] data;
 
     public static ArrayVector copyOf(Vector vector) {
@@ -29,12 +27,5 @@ public class ArrayVector implements Vector {
     @Override
     public double get(int i) {
         return data[i];
-    }
-
-    @Override
-    public String toString() {
-        return "ArrayVector{" +
-                "data=" + Arrays.toString(data) +
-                '}';
     }
 }

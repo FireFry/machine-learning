@@ -1,5 +1,6 @@
 package com.burakovv.ml;
 
+import com.burakovv.math.AbstractVector;
 import com.burakovv.math.ArrayVector;
 import com.burakovv.math.Matrix;
 import com.burakovv.math.Vector;
@@ -38,7 +39,7 @@ public class GradientDescent {
 
     private ArrayVector nextTheta;
 
-    private final Vector thetaView = new Vector() {
+    private final Vector thetaView = new AbstractVector() {
         @Override
         public int size() {
             return theta.size();
@@ -47,11 +48,6 @@ public class GradientDescent {
         @Override
         public double get(int i) {
             return theta.get(i);
-        }
-
-        @Override
-        public String toString() {
-            return theta.toString();
         }
     };
 

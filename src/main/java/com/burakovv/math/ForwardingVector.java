@@ -1,6 +1,6 @@
 package com.burakovv.math;
 
-public class ForwardingVector implements Vector {
+public class ForwardingVector extends AbstractVector {
     private final Vector delegate;
 
     public ForwardingVector(Vector delegate) {
